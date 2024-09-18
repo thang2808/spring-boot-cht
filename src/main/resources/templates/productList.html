@@ -28,6 +28,11 @@
                  <a style="color:red;"
                     th:href="@{|/admin/product?code=${prodInfo.code}|}">Edit Product</a>
                </li>
+               <!-- Nút Delete chỉ hiển thị cho Manager -->
+				
+ 			   <form th:action="@{|/admin/deleteProduct?code=${prodInfo.code}|}" method="post">
+        			<button type="submit" style="color:red;">Delete</button>
+   			   </form>
             </th:block>
          </ul>
       </div>

@@ -76,8 +76,6 @@ public class CartInfo {
 
 
     public void validate() {
-
-
     }
 
 

@@ -144,5 +144,11 @@ public class AdminController {
 
 		return "order";
 	}
-
+	
+	// xoa product
+	@RequestMapping(value = { "/admin/deleteProduct" }, method = RequestMethod.POST)
+    public String deleteProduct(@RequestParam("code") String code) {
+        productDAO.deleteProductByCode(code);
+        return "redirect:/productList";
+    }
 }

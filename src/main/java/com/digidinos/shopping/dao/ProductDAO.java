@@ -105,6 +105,17 @@ public class ProductDAO {
     public PaginationResult<ProductInfo> queryProducts(int page, int maxResult, int maxNavigationPage) {
         return queryProducts(page, maxResult, maxNavigationPage, null);
     }
+    
+    //Xoa product cho admin
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    public void deleteProductByCode(String code) {
+        Session session = this.sessionFactory.getCurrentSession();
+        Product product = this.findProduct(code);
+        if (product != null) {
+            session.delete(product);
+        }
+    }
+
 
 }
 
