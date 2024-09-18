@@ -1,13 +1,13 @@
 package com.digidinos.shopping.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "ORDERS", uniqueConstraints = { @UniqueConstraint(columnNames = "Order_Num") })
@@ -23,7 +23,7 @@ public class Order implements Serializable {
 
 
     @Column(name = "ORDER_DATE", nullable = false)
-    private LocalDateTime orderDate;
+    private Date orderDate;
 
 
     @Column(name = "ORDER_NUM", nullable = false)
@@ -60,12 +60,12 @@ public class Order implements Serializable {
     }
 
 
-    public LocalDateTime getOrderDate() {
+    public Date getOrderDate() {
         return orderDate;
     }
 
 
-    public void setOrderDate(LocalDateTime orderDate) {
+    public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
 

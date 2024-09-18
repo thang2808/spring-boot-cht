@@ -14,10 +14,7 @@ public class OrderDetailInfo {
 
 
     public OrderDetailInfo() {
-
-
     }
-
 
     // Sử dụng cho JPA/Hibernate Query.
     public OrderDetailInfo(String id, String productCode, //

@@ -1,13 +1,13 @@
 package com.digidinos.shopping.model;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class OrderInfo {
 
 
     private String id;
-    private LocalDateTime orderDate;
+    private Date orderDate;
     private int orderNum;
     private double amount;
 
@@ -22,13 +22,11 @@ public class OrderInfo {
 
 
     public OrderInfo() {
-
-
     }
 
 
     // Sử dụng cho Hibernate Query.
-    public OrderInfo(String id, LocalDateTime orderDate, int orderNum, //
+    public OrderInfo(String id, Date orderDate, int orderNum, //
             double amount, String customerName, String customerAddress, //
             String customerEmail, String customerPhone) {
         this.id = id;
@@ -54,12 +52,12 @@ public class OrderInfo {
     }
 
 
-    public LocalDateTime getOrderDate() {
+    public Date getOrderDate() {
         return orderDate;
     }
 
 
-    public void setOrderDate(LocalDateTime orderDate) {
+    public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
     }
 
