@@ -64,4 +64,3 @@ public class CustomerInfo {
         this.valid = valid;
     }
 }
-

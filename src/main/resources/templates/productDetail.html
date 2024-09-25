@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Detail</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles.css}">
+</head>
+<body>
+    <th:block th:include="/_header"></th:block>
+    <th:block th:include="/_menu"></th:block>
+
+    <div class="product-detail">
+        <h1 th:text="${productInfo.name}"></h1>
+        <img th:src="@{|/productImage?code=${productInfo.code}|}" alt="Product Image"/>
+        <p>Code: <span th:text="${productInfo.code}"></span></p>
+        <p>Price: <span th:text="${#numbers.formatDecimal(productInfo.price,3,2,'COMMA')}"></span></p>
+        <p>In Stock: <span th:text="${productInfo.repo}"></span></p>
+        <a th:href="@{|/buyProduct?code=${productInfo.code}|}">Buy Now</a>
+    </div>
+
+    <th:block th:include="/_footer"></th:block>
+</body>
+</html>

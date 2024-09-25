@@ -6,16 +6,17 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import com.digidinos.shopping.dao.ProductDAO;
+
 import com.digidinos.shopping.entity.Product;
 import com.digidinos.shopping.form.ProductForm;
+import com.digidinos.shopping.serviceWithRepo.ProductService;
 
 @Component
 public class ProductFormValidator implements Validator {
 
 
 	@Autowired
-	private ProductDAO productDAO;
+	private ProductService productService;
 
 
 	// Validator này chỉ dùng để kiểm tra class ProductForm.
@@ -34,6 +35,7 @@ public class ProductFormValidator implements Validator {
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "code", "NotEmpty.productForm.code");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "NotEmpty.productForm.name");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "price", "NotEmpty.productForm.price");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repo", "NotEmpty.productForm.repo");
 
 
 		String code = productForm.getCode();
@@ -41,7 +43,7 @@ public class ProductFormValidator implements Validator {
 			if (code.matches("\\s+")) {
 				errors.rejectValue("code", "Pattern.productForm.code");
 			} else if (productForm.isNewProduct()) {
-				Product product = productDAO.findProduct(code);
+				Product product = productService.findProduct(code);
 				if (product != null) {
 					errors.rejectValue("code", "Duplicate.productForm.code");
 				}
@@ -51,4 +53,3 @@ public class ProductFormValidator implements Validator {
 
 
 }
-

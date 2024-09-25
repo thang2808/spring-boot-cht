@@ -7,6 +7,7 @@ public class ProductForm {
     private String code;
     private String name;
     private double price;
+    private int repo;
 
 
     private boolean newProduct = false;
@@ -25,6 +26,7 @@ public class ProductForm {
         this.code = product.getCode();
         this.name = product.getName();
         this.price = product.getPrice();
+        this.repo = product.getRepo();
     }
 
 
@@ -78,5 +80,15 @@ public class ProductForm {
     }
 
 
-}
+	public int getRepo() {
+		return repo;
+	}
 
+
+	public void setRepo(int repo) {
+		this.repo = repo;
+	}
+    
+    
+
+}

@@ -20,6 +20,9 @@ public class Order implements Serializable {
     @Id
     @Column(name = "ID", length = 50)
     private String id;
+    
+    @Column(name = "ORDER_STATUS")
+    private String orderStatus;
 
 
     @Column(name = "ORDER_DATE", nullable = false)
@@ -130,5 +133,14 @@ public class Order implements Serializable {
     }
 
 
-}
+	public String getOrderStatus() {
+		return orderStatus;
+	}
 
+
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
+    
+}

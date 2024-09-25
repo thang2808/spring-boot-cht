@@ -36,8 +36,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Các yêu cầu phải login với vai trò ROLE_EMPLOYEE hoặc ROLE_MANAGER.
         // Nếu chưa login, nó sẽ redirect tới trang /admin/login.
         http.authorizeRequests()
-        .antMatchers("/admin/orderList", "/admin/order", "/admin/accountInfo")
-        .access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_MANAGER')");
+        .antMatchers("/admin/createAccount").permitAll()
+        .antMatchers("/admin/orderList", "/admin/order").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_MANAGER')");
+
+        
+        http.authorizeRequests()
+        .antMatchers("/admin/accountInfo").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_MANAGER') or hasAuthority('USER')");
 
         // Các trang chỉ dành cho MANAGER
         http.authorizeRequests().antMatchers("/admin/product", "/admin/deleteProduct").access("hasRole('ROLE_MANAGER')");

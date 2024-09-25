@@ -110,7 +110,7 @@ public class OrderDAO {
 		}
 		return new OrderInfo(order.getId(), order.getOrderDate(), //
 				order.getOrderNum(), order.getAmount(), order.getCustomerName(), //
-				order.getCustomerAddress(), order.getCustomerEmail(), order.getCustomerPhone());
+				order.getCustomerAddress(), order.getCustomerEmail(), order.getCustomerPhone(), order.getOrderStatus());
 	}
 
 	public List<OrderDetailInfo> listOrderDetailInfos(String orderId) {

@@ -16,6 +16,7 @@ public class OrderInfo {
     private String customerAddress;
     private String customerEmail;
     private String customerPhone;
+    private String orderStatus;
 
 
     private List<OrderDetailInfo> details;
@@ -28,7 +29,7 @@ public class OrderInfo {
     // Sử dụng cho Hibernate Query.
     public OrderInfo(String id, Date orderDate, int orderNum, //
             double amount, String customerName, String customerAddress, //
-            String customerEmail, String customerPhone) {
+            String customerEmail, String customerPhone, String orderStatus) {
         this.id = id;
         this.orderDate = orderDate;
         this.orderNum = orderNum;
@@ -39,6 +40,7 @@ public class OrderInfo {
         this.customerAddress = customerAddress;
         this.customerEmail = customerEmail;
         this.customerPhone = customerPhone;
+        this.orderStatus = orderStatus;
     }
 
 
@@ -132,5 +134,13 @@ public class OrderInfo {
     }
 
 
-}
+	public String getOrderStatus() {
+		return orderStatus;
+	}
 
+
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+    
+}

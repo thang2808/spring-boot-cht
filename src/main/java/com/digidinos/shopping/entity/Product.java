@@ -40,6 +40,9 @@ public class Product implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "CREATE_DATE", nullable = false)
     private Date createDate;
+    
+    @Column(name = "REPO")
+    private int repo;
 
 
     public Product() {
@@ -96,5 +99,15 @@ public class Product implements Serializable {
     }
 
 
-}
+	public int getRepo() {
+		return repo;
+	}
 
+
+	public void setRepo(int repo) {
+		this.repo = repo;
+	}
+    
+    
+
+}

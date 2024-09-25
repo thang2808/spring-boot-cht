@@ -3,10 +3,10 @@ package com.digidinos.shopping.model;
 public class CartLineInfo {
 	 
     private ProductInfo productInfo;
-    private int quantity;
+    private int quanity;
  
     public CartLineInfo() {
-        this.quantity = 0;
+        this.quanity = 0;
     }
  
     public ProductInfo getProductInfo() {
@@ -18,16 +18,15 @@ public class CartLineInfo {
     }
  
     public int getQuantity() {
-        return quantity;
+        return quanity;
     }
  
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setQuantity(int quanity) {
+        this.quanity = quanity;
     }
  
     public double getAmount() {
-        return this.productInfo.getPrice() * this.quantity;
+        return this.productInfo.getPrice() * this.quanity;
     }
     
 }
-

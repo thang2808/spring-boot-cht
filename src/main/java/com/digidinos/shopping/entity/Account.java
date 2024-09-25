@@ -18,7 +18,7 @@ public class Account implements Serializable {
 
     public static final String ROLE_MANAGER = "MANAGER";
     public static final String ROLE_EMPLOYEE = "EMPLOYEE";
-
+    public static final String ROLE_USER = "USER";
 
     @Id
     @Column(name = "USER_NAME", length = 20, nullable = false)

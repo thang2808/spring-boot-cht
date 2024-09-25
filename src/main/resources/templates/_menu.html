@@ -23,4 +23,19 @@
       </a>
       |
    </th:block>
+   <th:block sec:authorize="hasAuthority('USER')">
+      <a th:href="@{/myOrder}">
+      My Order
+      </a>
+      |
+   </th:block>
+   <th:block sec:authorize="hasAuthority('USER')">
+      <a th:href="@{/myOrder}">
+      Messenger
+      </a>
+      |
+   </th:block>
+   <a th:href="@{/shoppingCartCustomer}">
+   Setting
+   </a>
 </div>

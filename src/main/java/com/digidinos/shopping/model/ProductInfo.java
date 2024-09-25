@@ -6,6 +6,7 @@ public class ProductInfo {
     private String code;
     private String name;
     private double price;
+    private int repo;
 
 
     public ProductInfo() {
@@ -16,14 +17,16 @@ public class ProductInfo {
         this.code = product.getCode();
         this.name = product.getName();
         this.price = product.getPrice();
+        this.repo = product.getRepo();
     }
 
 
     // Sử dụng trong JPA/Hibernate query
-    public ProductInfo(String code, String name, double price) {
+    public ProductInfo(String code, String name, double price, int repo) {
         this.code = code;
         this.name = name;
         this.price = price;
+        this.repo = repo;
     }
 
 
@@ -57,5 +60,13 @@ public class ProductInfo {
     }
 
 
-}
+	public int getRepo() {
+		return repo;
+	}
 
+
+	public void setRepo(int repo) {
+		this.repo = repo;
+	}
+    
+}

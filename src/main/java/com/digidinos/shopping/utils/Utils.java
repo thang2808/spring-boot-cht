@@ -32,5 +32,8 @@ public class Utils {
 		return (CartInfo) request.getSession().getAttribute("lastOrderedCart");
 	}
 	 
-}
+	public static void storeCartInSession(HttpServletRequest request, CartInfo cartInfo) {
+	    request.getSession().setAttribute("myCart", cartInfo);
+	}
 
+}

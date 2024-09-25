@@ -20,12 +20,12 @@ public class CustomerForm {
     }
 
 
-    public CustomerForm(CustomerInfo customerInfo) {
-        if (customerInfo != null) {
-            this.name = customerInfo.getName();
-            this.address = customerInfo.getAddress();
-            this.email = customerInfo.getEmail();
-            this.phone = customerInfo.getPhone();
+    public CustomerForm(CustomerInfo customer) {
+        if (customer!= null) {
+            this.name = customer.getName();
+            this.address = customer.getAddress();
+            this.email = customer.getEmail();
+            this.phone = customer.getPhone();
         }
     }
 
@@ -81,4 +81,3 @@ public class CustomerForm {
 
 
 }
-

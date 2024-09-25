@@ -44,8 +44,14 @@ public class CartInfo {
     public List<CartLineInfo> getCartLines() {
         return this.cartLines;
     }
-
-
+    
+    public void setCartLines(List<CartLineInfo> cartLines) {
+        this.cartLines.clear();
+        if (cartLines != null) {
+            this.cartLines.addAll(cartLines);
+        }
+    }
+    
     private CartLineInfo findLineByCode(String code) {
         for (CartLineInfo line : this.cartLines) {
             if (line.getProductInfo().getCode().equals(code)) {
@@ -136,10 +142,6 @@ public class CartInfo {
                 this.updateProduct(line.getProductInfo().getCode(), line.getQuantity());
             }
         }
-
-
     }
 
-
 }
-

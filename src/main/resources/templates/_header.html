@@ -16,6 +16,12 @@
       <th:block sec:authorize="!isAuthenticated()">
          <a th:href="@{/admin/login}">Login</a>
       </th:block>
+      
+      <!-- Form tim kiem san pham -->
+      <form th:action="@{/search}" method="get" class="search-form">
+         <input type="text" name="keyword" placeholder="Search products..." class="search-input"/>
+         <button type="submit" class="search-button">Search</button>
+      </form>
    </div>
   
 </div>

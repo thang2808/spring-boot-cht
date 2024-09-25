@@ -42,7 +42,7 @@ public class ProductDAO {
         if (product == null) {
             return null;
         }
-        return new ProductInfo(product.getCode(), product.getName(), product.getPrice());
+        return new ProductInfo(product.getCode(), product.getName(), product.getPrice(), product.getRepo());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
@@ -118,4 +118,3 @@ public class ProductDAO {
 
 
 }
-

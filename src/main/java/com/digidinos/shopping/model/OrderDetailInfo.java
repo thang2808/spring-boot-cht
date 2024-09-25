@@ -87,4 +87,3 @@ public class OrderDetailInfo {
         this.amount = amount;
     }
 }
-

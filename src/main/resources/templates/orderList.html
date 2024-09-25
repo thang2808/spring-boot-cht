@@ -21,6 +21,7 @@
             <th>Customer Email</th>
             <th>Amount</th>
             <th>View</th>
+            <th>Status</th>
          </tr>
          <tr th:each="orderInfo : ${paginationResult.list}">
             <td th:utext="${orderInfo.orderNum}"></td>
@@ -31,6 +32,17 @@
             <td style="color:red;" th:utext="${#numbers.formatDecimal(orderInfo.amount,3,2,'COMMA')}">
             </td>
             <td><a th:href="@{|/admin/order?orderId=${orderInfo.id}|}">View</a></td>
+         	<td>
+         		<form th:action="@{/admin/order/updateStatus}" method="post">
+         			<select name="orderStatus">
+            			<option value="Shipped" th:selected="${orderInfo.orderStatus == 'Shipped'}">Đang giao</option>
+            			<option value="Delivered" th:selected="${orderInfo.orderStatus == 'Delivered'}">Đã giao</option>
+            			<option value="Canceled" th:selected="${orderInfo.orderStatus == 'Canceled'}">Hủy đơn</option>
+         			</select>
+         			<input type="hidden" th:value="${orderInfo.id}" name="orderId"/>
+         			<button type="submit">Update</button>
+      			</form>
+         	</td>
          </tr>
       </table>
       <div class="page-navigator" th:if="${paginationResult.totalPages > 1}" >
