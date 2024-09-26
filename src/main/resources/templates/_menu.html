@@ -24,7 +24,7 @@
       |
    </th:block>
    <th:block sec:authorize="hasAuthority('USER')">
-      <a th:href="@{/myOrder}">
+      <a th:href="@{/admin/orderListForUser}">
       My Order
       </a>
       |
@@ -35,7 +35,4 @@
       </a>
       |
    </th:block>
-   <a th:href="@{/shoppingCartCustomer}">
-   Setting
-   </a>
 </div>

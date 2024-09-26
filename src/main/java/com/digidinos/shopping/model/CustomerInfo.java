@@ -2,7 +2,7 @@ package com.digidinos.shopping.model;
 
 import com.digidinos.shopping.form.CustomerForm;
 
-public class CustomerInfo {
+public class CustomerInfo{
 
 
     private String name;

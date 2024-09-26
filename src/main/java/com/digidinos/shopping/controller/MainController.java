@@ -298,7 +298,6 @@ import com.digidinos.shopping.model.CartLineInfo;
 import com.digidinos.shopping.model.CustomerInfo;
 import com.digidinos.shopping.model.ProductInfo;
 import com.digidinos.shopping.pagination.*;
-import com.digidinos.shopping.repository.AccountRepository;
 import com.digidinos.shopping.serviceWithRepo.AccountService;
 import com.digidinos.shopping.serviceWithRepo.OrderService;
 import com.digidinos.shopping.serviceWithRepo.ProductService;
@@ -616,5 +615,6 @@ public class MainController {
 	    // Trả về view cho chi tiết sản phẩm
 	    return "productDetail";
 	}
+	
 }
 

@@ -38,11 +38,4 @@ public class AccountService {
 	    accountRepository.save(account);
 	}
 	
-//	public void saveCustomerInfo(CustomerForm customerForm) {
-//		CustomerInfo customerInfo = new CustomerInfo();
-//		customerInfo.setName(customerForm.getName());
-//		customerInfo.setEmail(customerForm.getEmail());
-//		customerInfo.setPhone(customerForm.getPhone());
-//		customerInfo.setAddress(customerForm.getAddress());
-//	}
 }

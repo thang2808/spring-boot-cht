@@ -37,7 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // Nếu chưa login, nó sẽ redirect tới trang /admin/login.
         http.authorizeRequests()
         .antMatchers("/admin/createAccount").permitAll()
-        .antMatchers("/admin/orderList", "/admin/order").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_MANAGER')");
+        .antMatchers("/admin/order","/admin/orderList").access("hasAnyRole('ROLE_EMPLOYEE', 'ROLE_MANAGER')");
 
         
         http.authorizeRequests()
@@ -45,7 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Các trang chỉ dành cho MANAGER
         http.authorizeRequests().antMatchers("/admin/product", "/admin/deleteProduct").access("hasRole('ROLE_MANAGER')");
-
+        // Các trang chỉ dành cho USER
+        http.authorizeRequests().antMatchers("/admin/orderListForUser").access("hasAuthority('USER')");
         // Khi người dùng đã login, với vai trò XX.
         // Nhưng truy cập vào trang yêu cầu vai trò YY,
         // Ngoại lệ AccessDeniedException sẽ ném ra.

@@ -156,8 +156,12 @@ package com.digidinos.shopping.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -169,9 +173,11 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.digidinos.shopping.entity.Account;
 import com.digidinos.shopping.entity.Product;
 import com.digidinos.shopping.form.AccountForm;
 import com.digidinos.shopping.form.ProductForm;
+import com.digidinos.shopping.model.CustomerInfo;
 import com.digidinos.shopping.model.OrderDetailInfo;
 import com.digidinos.shopping.model.OrderInfo;
 import com.digidinos.shopping.pagination.PaginationResult;
@@ -290,6 +296,53 @@ public class AdminController {
 		model.addAttribute("paginationResult", paginationResult);
 		return "orderList";
 	}
+	
+	// Hiển thị danh sách order của tài khoản
+	@RequestMapping(value = { "/admin/orderListForUser" }, method = RequestMethod.GET)
+	public String orderListForUser(Model model, //
+	        @RequestParam(value = "page", defaultValue = "1") String pageStr, 
+	        HttpServletRequest request) {
+		String email = null;
+		// Lấy thông tin tài khoản đã đăng nhập
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication != null && authentication.isAuthenticated()) {
+	        String userName = authentication.getName();
+	        Account account = accountService.findAccount(userName);
+
+	        if (account != null) {
+	            email = account.getGmail();
+	        }
+	    }
+
+
+	    if (email == null) {
+	        System.out.println("Email is null for customerInfo.");
+	        return "redirect:/login"; // Xử lý thêm nếu email là null
+	    }
+	    
+	    int page = 1;
+	    try {
+	        page = Integer.parseInt(pageStr);
+	    } catch (Exception e) {
+	        // Có thể log lỗi hoặc xử lý thêm nếu cần
+	        System.out.println("Error parsing page number: " + e.getMessage());
+	    }
+	    
+	    final int MAX_RESULT = 5;
+	    final int MAX_NAVIGATION_PAGE = 10;
+
+	    // Lấy danh sách đơn hàng theo email
+	    PaginationResult<OrderInfo> paginationResult = orderService.listOrderInfoByEmail(email, page, MAX_RESULT, MAX_NAVIGATION_PAGE);
+	    
+	    if (paginationResult == null) {
+	        System.out.println("PaginationResult is null for email: " + email);
+	        // Có thể thêm xử lý nếu paginationResult là null
+	    }
+	    
+	    model.addAttribute("paginationResult", paginationResult);
+	    return "orderList"; 
+	}
+
 
 	// GET: Hiển thị product
 	@RequestMapping(value = { "/admin/product" }, method = RequestMethod.GET)

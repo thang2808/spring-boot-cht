@@ -21,7 +21,7 @@
             <th>Customer Email</th>
             <th>Amount</th>
             <th>View</th>
-            <th>Status</th>
+            <th>Status</th>	
          </tr>
          <tr th:each="orderInfo : ${paginationResult.list}">
             <td th:utext="${orderInfo.orderNum}"></td>

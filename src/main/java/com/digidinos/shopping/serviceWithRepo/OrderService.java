@@ -136,4 +136,18 @@ public class OrderService {
             throw new RuntimeException("Order not found!");
         }
     }
+    
+    //tim don hang theo gmail 
+    public PaginationResult<OrderInfo> listOrderInfoByEmail(String email, int page, int maxResult, int maxNavigationPage) {
+        Pageable pageable = PageRequest.of(page - 1, maxResult, Sort.by("orderNum").descending());
+        Page<Order> orderPage = orderRepository.findByCustomerEmail(email, pageable);
+
+        // Chuyển dữ liệu từ Page sang PaginationResult
+        return new PaginationResult<>(orderPage.map(order -> new OrderInfo(
+            order.getId(), order.getOrderDate(), order.getOrderNum(),
+            order.getAmount(), order.getCustomerName(), order.getCustomerAddress(),
+            order.getCustomerEmail(), order.getCustomerPhone(), order.getOrderStatus()
+        )), page, maxNavigationPage);
+    }
+
 }
