@@ -14,7 +14,9 @@
       <div>Total Order Count: <span th:utext="${paginationResult.totalRecords}"></span></div>
       <table border="1" style="width:100%">
          <tr>
-            <th>Order Num</th>
+         	<th:block sec:authorize="hasAuthority('ROLE_MANAGER')">
+            	<th>Order Num</th>
+            </th:block>
             <th>Order Date</th>
             <th>Customer Name</th>
             <th>Customer Address</th>
@@ -24,7 +26,9 @@
             <th>Status</th>	
          </tr>
          <tr th:each="orderInfo : ${paginationResult.list}">
-            <td th:utext="${orderInfo.orderNum}"></td>
+         	<th:block sec:authorize="hasAuthority('ROLE_MANAGER')">
+            	<td th:utext="${orderInfo.orderNum}"></td>
+            </th:block>
             <td th:utext="${#dates.format(orderInfo.orderDate,'dd-MM-yyyy HH:mm')}"></td>
             <td th:utext="${orderInfo.customerName}"></td>
             <td th:utext="${orderInfo.customerAddress}"></td>
@@ -34,10 +38,17 @@
             <td><a th:href="@{|/admin/order?orderId=${orderInfo.id}|}">View</a></td>
          	<td>
          		<form th:action="@{/admin/order/updateStatus}" method="post">
+         			<span>Trạng thái hiện tại: <b th:text="${orderInfo.orderStatus}"></b></span>
+         			<br/>
          			<select name="orderStatus">
-            			<option value="Shipped" th:selected="${orderInfo.orderStatus == 'Shipped'}">Đang giao</option>
-            			<option value="Delivered" th:selected="${orderInfo.orderStatus == 'Delivered'}">Đã giao</option>
-            			<option value="Canceled" th:selected="${orderInfo.orderStatus == 'Canceled'}">Hủy đơn</option>
+         				<th:block sec:authorize="hasAuthority('ROLE_MANAGER')">
+            				<option value="Shipped" th:selected="${orderInfo.orderStatus == 'Shipped'}">Đang giao</option>
+            				<option value="Canceled" th:selected="${orderInfo.orderStatus == 'Canceled'}">Hủy đơn</option>
+            			</th:block>
+            			<th:block sec:authorize="hasAuthority('USER')">
+         					<option value="Delivered" th:selected="${orderInfo.orderStatus == 'Delivered'}">Đã nhận</option>
+         					<option value="Canceled" th:selected="${orderInfo.orderStatus == 'Canceled'}">Hủy đơn</option>
+         				</th:block>
          			</select>
          			<input type="hidden" th:value="${orderInfo.id}" name="orderId"/>
          			<button type="submit">Update</button>

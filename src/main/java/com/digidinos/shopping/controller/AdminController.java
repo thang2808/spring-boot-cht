@@ -161,7 +161,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -177,7 +176,6 @@ import com.digidinos.shopping.entity.Account;
 import com.digidinos.shopping.entity.Product;
 import com.digidinos.shopping.form.AccountForm;
 import com.digidinos.shopping.form.ProductForm;
-import com.digidinos.shopping.model.CustomerInfo;
 import com.digidinos.shopping.model.OrderDetailInfo;
 import com.digidinos.shopping.model.OrderInfo;
 import com.digidinos.shopping.pagination.PaginationResult;
@@ -412,9 +410,28 @@ public class AdminController {
 	
 	// quan ly trang thai don hang
 	@PostMapping("/admin/order/updateStatus")
-    public String updateOrderStatus(@RequestParam("orderId") String orderId,
-                                    @RequestParam("orderStatus") String orderStatus) {
-        orderService.updateOrderStatus(orderId, orderStatus);
-        return "redirect:/admin/orderList";
-    }
+	public String updateOrderStatus(@RequestParam("orderId") String orderId,
+	                                @RequestParam("orderStatus") String orderStatus,
+	                                Authentication authentication) {
+	    // Cập nhật trạng thái đơn hàng
+	    orderService.updateOrderStatus(orderId, orderStatus);
+
+	    // Lấy thông tin người dùng hiện tại
+	    String currentUserRole = authentication.getAuthorities().stream()
+	                                           .findFirst()
+	                                           .get()
+	                                           .getAuthority();
+
+	    // Điều hướng sau khi cập nhật dựa trên vai trò
+	    if (currentUserRole.equals("ROLE_MANAGER")) {
+	        // Quay lại danh sách đơn hàng của Manager
+	        return "redirect:/admin/orderList";
+	    } else if (currentUserRole.equals("USER")) {
+	        // Quay lại danh sách đơn hàng của User
+	        return "redirect:/admin/orderListForUser";
+	    }
+
+	    // Trường hợp không xác định, quay lại trang chủ
+	    return "redirect:/";
+	}
 }
