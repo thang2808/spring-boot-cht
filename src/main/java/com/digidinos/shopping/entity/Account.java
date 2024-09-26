@@ -35,8 +35,18 @@ public class Account implements Serializable {
 
     @Column(name = "USER_ROLE", length = 20, nullable = false)
     private String userRole;
+    
+    @Column(name = "GMAIL", length = 128, nullable = false)
+    private String gmail;
 
+    public String getGmail() {
+        return gmail;
+    }
 
+    public void setGmail(String gmail) {
+        this.gmail = gmail;
+    }
+    
     public String getUserName() {
         return userName;
     }

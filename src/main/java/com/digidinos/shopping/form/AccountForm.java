@@ -1,5 +1,6 @@
 package com.digidinos.shopping.form;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -15,7 +16,12 @@ public class AccountForm {
 
     @NotBlank(message = "Confirm Password is required")
     private String confirmPassword; 
-
+    
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    @Size(max = 128, message = "Email must be less than 128 characters")
+    private String gmail;
+    
     private boolean active = true; 
 
     public String getUserName() {
@@ -49,4 +55,14 @@ public class AccountForm {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+	public String getGmail() {
+		return gmail;
+	}
+
+	public void setGmail(String gmail) {
+		this.gmail = gmail;
+	}
+    
+    
 }

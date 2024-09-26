@@ -229,6 +229,10 @@ public class AdminController {
 	        BindingResult result, //
 	        final RedirectAttributes redirectAttributes) {
 		
+		if (accountService.findAccountByGmail(accountForm.getGmail()) != null) {
+	        result.rejectValue("gmail", "error.accountForm", "Email already exists");
+	    }
+		
 		// Kiểm tra nếu tên đăng nhập đã tồn tại bằng cách sử dụng findAccount
 	    if (accountService.findAccount(accountForm.getUserName()) != null) {
 	        result.rejectValue("userName", "error.accountForm", "Username already exists");

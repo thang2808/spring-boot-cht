@@ -14,6 +14,13 @@
     <div class="signup-container">
         <form th:action="@{/admin/createAccount}" th:object="${accountForm}" method="POST">
             <table>
+            	<tr>
+                    <td>Email *</td>
+                    <td>
+                        <input type="email" th:field="*{gmail}" />
+                        <span class="error-message" th:if="${#fields.hasErrors('gmail')}" th:errors="*{gmail}">..</span>
+                    </td>
+                </tr>
                 <tr>
                     <td>User Name *</td>
                     <td>

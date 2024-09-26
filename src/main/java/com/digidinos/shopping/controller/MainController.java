@@ -275,6 +275,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -288,6 +290,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.digidinos.shopping.entity.Account;
 import com.digidinos.shopping.entity.Product;
 import com.digidinos.shopping.form.CustomerForm;
 import com.digidinos.shopping.model.CartInfo;
@@ -295,6 +298,8 @@ import com.digidinos.shopping.model.CartLineInfo;
 import com.digidinos.shopping.model.CustomerInfo;
 import com.digidinos.shopping.model.ProductInfo;
 import com.digidinos.shopping.pagination.*;
+import com.digidinos.shopping.repository.AccountRepository;
+import com.digidinos.shopping.serviceWithRepo.AccountService;
 import com.digidinos.shopping.serviceWithRepo.OrderService;
 import com.digidinos.shopping.serviceWithRepo.ProductService;
 import com.digidinos.shopping.utils.*;
@@ -303,6 +308,9 @@ import com.digidinos.shopping.validator.CustomerFormValidator;
 @Controller
 @Transactional
 public class MainController {
+	
+	@Autowired 
+	private AccountService accountService;
 
 	@Autowired
 	private OrderService orderService;
@@ -402,34 +410,34 @@ public class MainController {
 	}
 
 	// POST: Cập nhập số lượng cho các sản phẩm đã mua.
-		@RequestMapping(value = { "/shoppingCart" }, method = RequestMethod.POST)
-		public String shoppingCartUpdateQty(HttpServletRequest request, //
-				Model model, //
-				@ModelAttribute("cartForm") CartInfo cartForm) {
-			// lay thong tin trong gio hang
-			CartInfo cartInfo = Utils.getCartInSession(request);
-			// Kiểm tra số lượng từng sản phẩm
-		    for (CartLineInfo cartLine : cartForm.getCartLines()) {
-		        ProductInfo productInfo = productService.findProductInfo(cartLine.getProductInfo().getCode());
-		        if (productInfo != null) {
-		            int remainingStock = productInfo.getRepo(); // Số lượng còn trong kho
-		            int quantityToBuy = cartLine.getQuantity(); // Số lượng người dùng muốn mua
-		            
-		            // Kiểm tra điều kiện số lượng
-		            if (quantityToBuy > remainingStock || quantityToBuy <= 0) {
-		                model.addAttribute("errorMessage", "Quantity must be less than or equal to stock for product: " 
-		                                                  + productInfo.getName());
-		                model.addAttribute("cartForm", cartForm); // Hiển thị lại thông tin giỏ hàng
-		                return "shoppingCart"; // Trả về trang giỏ hàng với thông báo lỗi
-		            }
-		        }
-		    }
-		    
-		    
-			cartInfo.updateQuantity(cartForm);
+	@RequestMapping(value = { "/shoppingCart" }, method = RequestMethod.POST)
+	public String shoppingCartUpdateQty(HttpServletRequest request, //
+			Model model, //
+			@ModelAttribute("cartForm") CartInfo cartForm) {
+		// lay thong tin trong gio hang
+		CartInfo cartInfo = Utils.getCartInSession(request);
+		// Kiểm tra số lượng từng sản phẩm
+	    for (CartLineInfo cartLine : cartForm.getCartLines()) {
+	        ProductInfo productInfo = productService.findProductInfo(cartLine.getProductInfo().getCode());
+	        if (productInfo != null) {
+	            int remainingStock = productInfo.getRepo(); // Số lượng còn trong kho
+	            int quantityToBuy = cartLine.getQuantity(); // Số lượng người dùng muốn mua
+	            
+	            // Kiểm tra điều kiện số lượng
+	            if (quantityToBuy > remainingStock || quantityToBuy <= 0) {
+	                model.addAttribute("errorMessage", "Quantity must be less than or equal to stock for product: " 
+	                                                  + productInfo.getName());
+	                model.addAttribute("cartForm", cartForm); // Hiển thị lại thông tin giỏ hàng
+	                return "shoppingCart"; // Trả về trang giỏ hàng với thông báo lỗi
+	            }
+	        }
+	    }
+	    
+	    
+		cartInfo.updateQuantity(cartForm);
 
-			return "redirect:/shoppingCart";
-		}
+		return "redirect:/shoppingCart";
+	}
 
 
 
@@ -443,45 +451,56 @@ public class MainController {
 	}
 
 	// GET: Nhập thông tin khách hàng.
-		@RequestMapping(value = { "/shoppingCartCustomer" }, method = RequestMethod.GET)
-		public String shoppingCartCustomerForm(HttpServletRequest request, Model model) {
+	@RequestMapping(value = { "/shoppingCartCustomer" }, method = RequestMethod.GET)
+	public String shoppingCartCustomerForm(HttpServletRequest request, Model model) {
 
-			CartInfo cartInfo = Utils.getCartInSession(request);
+		CartInfo cartInfo = Utils.getCartInSession(request);
 
-			if (cartInfo.isEmpty()) {
+		if (cartInfo.isEmpty()) {
 
-				return "redirect:/shoppingCart";
-			}
-			CustomerInfo customerInfo = cartInfo.getCustomerInfo();
+			return "redirect:/shoppingCart";
+		}
+		CustomerInfo customerInfo = cartInfo.getCustomerInfo();
+		CustomerForm customerForm = new CustomerForm(customerInfo);
+		
+		// Lấy thông tin tài khoản đã đăng nhập
+	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	    if (authentication != null && authentication.isAuthenticated()) {
+	        String userName = authentication.getName();
+	        Account account = accountService.findAccount(userName);
 
-			CustomerForm customerForm = new CustomerForm(customerInfo);
+	        if (account != null) {
+	            // Nếu đã đăng nhập và có tài khoản, sử dụng email từ tài khoản đó
+	            customerForm.setEmail(account.getGmail());
+	        }
+	    }
 
-			model.addAttribute("customerForm", customerForm);
+		model.addAttribute("customerForm", customerForm);
 
+		return "shoppingCartCustomer";
+	}
+
+	// POST: Save thông tin khách hàng.
+	@RequestMapping(value = { "/shoppingCartCustomer" }, method = RequestMethod.POST)
+	public String shoppingCartCustomerSave(HttpServletRequest request, //
+			Model model, //
+			@ModelAttribute("customerForm") @Validated CustomerForm customerForm, //
+			BindingResult result, //
+			final RedirectAttributes redirectAttributes) {
+
+		if (result.hasErrors()) {
+			customerForm.setValid(false);
+			// Forward tới trang nhập lại.
 			return "shoppingCartCustomer";
 		}
 
-		// POST: Save thông tin khách hàng.
-		@RequestMapping(value = { "/shoppingCartCustomer" }, method = RequestMethod.POST)
-		public String shoppingCartCustomerSave(HttpServletRequest request, //
-				Model model, //
-				@ModelAttribute("customerForm") @Validated CustomerForm customerForm, //
-				BindingResult result, //
-				final RedirectAttributes redirectAttributes) {
+		customerForm.setValid(true);
+		CartInfo cartInfo = Utils.getCartInSession(request);
+		CustomerInfo customerInfo = new CustomerInfo(customerForm);
+		cartInfo.setCustomerInfo(customerInfo);
 
-			if (result.hasErrors()) {
-				customerForm.setValid(false);
-				// Forward tới trang nhập lại.
-				return "shoppingCartCustomer";
-			}
-
-			customerForm.setValid(true);
-			CartInfo cartInfo = Utils.getCartInSession(request);
-			CustomerInfo customerInfo = new CustomerInfo(customerForm);
-			cartInfo.setCustomerInfo(customerInfo);
-
-			return "redirect:/shoppingCartConfirmation";
-		}
+		return "redirect:/shoppingCartConfirmation";
+	}
 
 	// GET: Xem lại thông tin để xác nhận.
 	@RequestMapping(value = { "/shoppingCartConfirmation" }, method = RequestMethod.GET)

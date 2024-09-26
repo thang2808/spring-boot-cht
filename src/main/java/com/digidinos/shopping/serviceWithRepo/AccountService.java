@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.digidinos.shopping.entity.Account;
 import com.digidinos.shopping.form.AccountForm;
-import com.digidinos.shopping.form.CustomerForm;
-import com.digidinos.shopping.model.CustomerInfo;
 import com.digidinos.shopping.repository.AccountRepository;
 
 @Service
@@ -23,12 +21,19 @@ public class AccountService {
 		return accountRepository.findByUserName(userName);
 	}
 	
+	// Tìm tài khoản theo email
+    public Account findAccountByGmail(String gmail) {
+        return accountRepository.findByGmail(gmail);
+    }
+
+	
 	public void saveAccount(AccountForm accountForm) {
 	    Account account = new Account();
 	    account.setUserName(accountForm.getUserName());
 	    account.setEncrytedPassword(passwordEncoder.encode(accountForm.getPassword())); // Mã hóa mật khẩu
 	    account.setActive(accountForm.isActive());
 	    account.setUserRole(Account.ROLE_USER); // Gán ROLE_USER làm mặc định
+	    account.setGmail(accountForm.getGmail());
 
 	    accountRepository.save(account);
 	}
