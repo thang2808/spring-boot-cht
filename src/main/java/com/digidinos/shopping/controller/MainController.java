@@ -270,6 +270,8 @@
 package com.digidinos.shopping.controller;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -285,12 +287,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.digidinos.shopping.entity.Account;
+import com.digidinos.shopping.entity.Comment;
 import com.digidinos.shopping.entity.Product;
 import com.digidinos.shopping.form.CustomerForm;
 import com.digidinos.shopping.model.CartInfo;
@@ -299,6 +303,7 @@ import com.digidinos.shopping.model.CustomerInfo;
 import com.digidinos.shopping.model.ProductInfo;
 import com.digidinos.shopping.pagination.*;
 import com.digidinos.shopping.serviceWithRepo.AccountService;
+import com.digidinos.shopping.serviceWithRepo.CommentService;
 import com.digidinos.shopping.serviceWithRepo.OrderService;
 import com.digidinos.shopping.serviceWithRepo.ProductService;
 import com.digidinos.shopping.utils.*;
@@ -316,6 +321,9 @@ public class MainController {
 
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+    private CommentService commentService;
 
 	@Autowired
 	private CustomerFormValidator customerFormValidator;
@@ -599,22 +607,56 @@ public class MainController {
     }
 	
 	// hien thi thong tin san pham khi click vao
-	@RequestMapping(value = { "/productDetail" }, method = RequestMethod.GET)
-	public String productDetail(@RequestParam("code") String code, Model model) {
-	    // Tìm thông tin sản phẩm theo mã sản phẩm
-	    ProductInfo productInfo = productService.findProductInfo(code);
-	    
-	    // Kiểm tra nếu sản phẩm không tồn tại
-	    if (productInfo == null) {
-	        return "redirect:/productList"; // Chuyển hướng về danh sách sản phẩm
-	    }
-	    
-	    // Thêm thông tin sản phẩm vào model để sử dụng trong view
-	    model.addAttribute("productInfo", productInfo);
-	    
-	    // Trả về view cho chi tiết sản phẩm
-	    return "productDetail";
-	}
+			@RequestMapping(value = { "/productDetail" }, method = RequestMethod.GET)
+			public String productDetail(@RequestParam("code") String code, Model model) {
+			    // Tìm thông tin sản phẩm theo mã sản phẩm
+			    ProductInfo productInfo = productService.findProductInfo(code);
+			    
+			    // Kiểm tra nếu sản phẩm không tồn tại
+			    if (productInfo == null) {
+			        return "redirect:/productList"; // Chuyển hướng về danh sách sản phẩm
+			    }
+			    
+			    // Thêm thông tin sản phẩm vào model để sử dụng trong view
+			    model.addAttribute("productInfo", productInfo);
+			    
+			    // Lấy danh sách bình luận cho sản phẩm
+			    List<Comment> comments = commentService.findCommentsByProductCode(code);
+			    model.addAttribute("comments", comments); // Thêm danh sách bình luận vào model
+			    
+			    // Trả về view cho chi tiết sản phẩm
+			    return "productDetail";
+			}
+			
+			@RequestMapping(value = { "/products/{code}/comment" }, method = RequestMethod.POST)
+			public String addComment(@PathVariable("code") String code, 
+			                         @ModelAttribute("newComment") Comment newComment, 
+			                         HttpServletRequest request, 
+			                         RedirectAttributes redirectAttributes) {
+			    Product product = productService.findProduct(code);
+			    
+			    // Lấy thông tin tài khoản đang đăng nhập
+			    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			    if (authentication != null && authentication.isAuthenticated()) {
+			        String userName = authentication.getName(); // Tên đăng nhập
+			        Account account = accountService.findAccount(userName); // Lấy tài khoản từ dịch vụ
+			        
+			        if (account != null) {
+			            newComment.setName(account.getUserName()); // Giả sử bạn có phương thức getUserName()
+			            newComment.setEmail(account.getGmail()); // Giả sử bạn đã lưu email trong account
+			            newComment.setCreatedAt(new Date()); // cap nhat thoi gian cmt
+			        }
+			    }
+			    
+			    if (product != null) {
+			        newComment.setProduct(product);
+			        // Lưu comment vào cơ sở dữ liệu
+			        commentService.saveComment(newComment);
+			        redirectAttributes.addFlashAttribute("message", "Bình luận của bạn đã được thêm thành công.");
+			    } 
+			    return "redirect:/productDetail?code=" + code;
+			}
+
 	
 }
 
