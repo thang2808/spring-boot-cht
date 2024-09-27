@@ -1,5 +1,7 @@
 package com.digidinos.shopping.serviceWithRepo;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,5 +39,8 @@ public class AccountService {
 
 	    accountRepository.save(account);
 	}
-	
+	public List<Account> findAllUsers() {
+	    return accountRepository.findAll();
+	}
+
 }

@@ -1,7 +1,216 @@
-<div class="footer-container" xmlns:th="http://www.thymeleaf.org">
- 
-   @Copy right <a href="http://o7planning.org" target="_blank">o7planning.org</a>
-   <br>
-   See more <a>demo</a>
-    
-</div>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chat</title>
+    <style>
+        /* CSS cho cua so chat */
+
+        #chatWindow {
+            position: fixed;
+            bottom: 50px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            border: 1px solid #ccc;
+            background-color: white;
+            display: none;
+            flex-direction: column;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        #messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+            height: 300px;
+        }
+
+        #messageInput {
+            width: 70%;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            margin-left: 5px;
+        }
+
+        select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .message strong {
+            color: #2e86de;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="footer-container">
+        @Copy right <a href="http://o7planning.org" target="_blank">o7planning.org</a>
+        <br>
+        See more <a href="#">demo</a>
+        <br>
+        <!-- Nút Nhắn Tin -->
+        <button id="openChatButton" onclick="openChat()">Nhắn Tin</button> 
+    </div>
+
+    <!-- Ô chat -->
+    <div id="chatWindow">
+        <h4>Chat</h4>
+        <div id="messages"></div>
+        
+        
+        
+        <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." />
+        <button onclick="sendMessage()">Gửi</button>
+        <button onclick="closeChat()">Đóng</button>
+    </div>
+
+    <!-- Thư viện SockJS và STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        let stompClient = null;
+        let currentUser = null; // Tên người dùng hiện tại
+        let userRole = null; // Vai trò của người dùng
+
+        // Hàm kết nối WebSocket
+        function connect() {
+            const socket = new SockJS('/chat');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+
+                // Lấy tên người dùng hiện tại
+                fetch('/api/user/name')
+                    .then(response => response.text())
+                    .then(name => {
+                        currentUser = name;
+                        console.log('Current User:', currentUser);
+
+                        // Lấy vai trò của người dùng
+                        fetch('/api/user/role')
+                            .then(response => response.text())
+                            .then(role => {
+                                userRole = role;
+                                console.log('User Role:', userRole);
+
+                                if (userRole === 'USER') {
+          
+                                    stompClient.subscribe('/user/queue/messages', function (message) {
+                                        showMessage(JSON.parse(message.body));
+                                    });
+
+                                    // Ẩn dropdown chọn người nhận và đặt recipient cố định là manager1
+                                    document.getElementById('recipientContainer').style.display = 'none';
+                                } else if (userRole === 'ROLE_MANAGER') {
+                                    // Manager: subscribe to messages sent to manager1
+                                    stompClient.subscribe('/user/manager1/queue/messages', function (message) {
+                                        showMessage(JSON.parse(message.body));
+                                    });
+
+                                    // Hiển thị dropdown chọn người nhận
+                                    document.getElementById('recipientContainer').style.display = 'block';
+
+                                    // Lấy danh sách users để populate dropdown
+                                    fetch('/api/users')
+                                        .then(response => response.json())
+                                        .then(users => {
+                                            const recipientSelect = document.getElementById("recipientSelect");
+                                            users.forEach(user => {
+                                                const option = document.createElement("option");
+                                                option.value = user.username; // giả sử `username` là thuộc tính
+                                                option.text = user.username;
+                                                recipientSelect.add(option);
+                                            });
+                                        })
+                                        .catch(error => console.error('Error fetching users:', error));
+                                }
+                            })
+                            .catch(error => console.error('Error fetching user role:', error));
+                    })
+                    .catch(error => console.error('Error fetching user name:', error));
+            }, function (error) {
+                console.error('STOMP error: ' + error);
+            });
+        }
+
+        // Hàm mở cửa sổ chat
+        function openChat() {
+            document.getElementById("chatWindow").style.display = "flex"; // Đổi thành flex để hỗ trợ flex-direction
+            connect(); // Kết nối khi mở chat
+        }
+
+        // Hàm đóng cửa sổ chat
+        function closeChat() {
+            document.getElementById("chatWindow").style.display = "none";
+            if (stompClient) {
+                stompClient.disconnect(); // Ngắt kết nối khi đóng chat
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            let recipient = 'manager1'; // default cho users
+
+            if (userRole === 'ROLE_MANAGER') {
+                const recipientSelect = document.getElementById("recipientSelect");
+                recipient = recipientSelect.value;
+
+                if (!recipient) {
+                    alert('Vui lòng chọn người nhận.');
+                    return;
+                }
+            }
+
+            if (message.trim() === '') {
+                alert('Vui lòng nhập tin nhắn.');
+                return;
+            }
+
+            const chatMessage = {
+                from: currentUser, // thêm thông tin người gửi
+                to: recipient,
+                content: message
+            };
+
+            if (userRole === 'USER') {
+                // Users gửi tin nhắn đến manager1
+                stompClient.send("/app/sendMessage", {}, JSON.stringify(chatMessage));
+            } else if (userRole === 'ROLE_MANAGER') {
+                // Manager gửi tin nhắn đến user cụ thể
+                stompClient.send("/app/reply", {}, JSON.stringify(chatMessage));
+            }
+
+            // Hiển thị tin nhắn đã gửi trong chat window
+            const messagesDiv = document.getElementById("messages");
+            messagesDiv.innerHTML += `<div class="message"><strong>Bạn:</strong> ${message}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Cuộn đến tin nhắn mới nhất
+            messageInput.value = ""; // Xóa input sau khi gửi
+        }
+
+
+        // Hàm hiển thị tin nhắn nhận được
+        function showMessage(message) {
+            const messagesDiv = document.getElementById("messages");
+            if (message.from === currentUser) {
+                messagesDiv.innerHTML += `<div class="message"><strong>Bạn:</strong> ${message.content}</div>`;
+            } else {
+                messagesDiv.innerHTML += `<div class="message"><strong>${message.from}:</strong> ${message.content}</div>`;
+            }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Cuộn đến tin nhắn mới nhất
+        }
+
+    </script>
+</body>
+</html>
